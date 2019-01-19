@@ -1,3 +1,4 @@
 src/
 types/
 tsconfig.json
+dist/test.js
