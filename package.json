@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@angular-devkit/build-optimizer": "~0.12.2",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#1deb74f",
     "minimist": "~1.2.0",
     "rollup": "~1.1.0",
     "rollup-plugin-filesize": "~6.0.0",
