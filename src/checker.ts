@@ -5,6 +5,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import filesize from 'rollup-plugin-filesize';
 import { terser } from 'rollup-plugin-terser';
 import buildOptimizer from '@angular-devkit/build-optimizer/src/build-optimizer/rollup-plugin.js';
+import { MinifyOptions } from 'terser';
 
 
 export interface CheckSideEffectsOptions {
@@ -53,7 +54,9 @@ export async function checkSideEffects({
   writeFileSync(tmpInputFilename, resolvedEsModules.map(m => `import '${m}';`).join('\n'));
 
   // Terser config for side effect detection.
-  const terserConfig = {
+  const terserConfig: MinifyOptions = {
+    module: true, // assume code is a ES module (implies toplevel as well)
+    ecma: 6, // enable ES2015 optimizations
     mangle: false,
     output: {
       comments: false,
@@ -73,8 +76,6 @@ export async function checkSideEffects({
       global_defs: globalDefs, // asume these variables are defined as the value provided
       reduce_vars: true, // optimization on variables assigned with and used as constant values
       reduce_funcs: true, // allows single-use functions to be inlined as function expressions
-      module: true, // mark code as being a es2015 module (implies toplevel as well)
-      toplevel: true, // drop unreferenced functions ("funcs") and/or variables
       evaluate: true, // evaluate constant expressions
       dead_code: true, // drop dead code
     },
