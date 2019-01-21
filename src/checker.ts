@@ -71,9 +71,6 @@ export async function checkSideEffects({
       pure_getters: pureGetters, // assume prop access has no side effects
       passes: 3, // run compress 3 times
       global_defs: globalDefs, // asume these variables are defined as the value provided
-      // global_defs: {
-      //   ngDevMode: false, 
-      // },
       reduce_vars: true, // optimization on variables assigned with and used as constant values
       reduce_funcs: true, // allows single-use functions to be inlined as function expressions
       module: true, // mark code as being a es2015 module (implies toplevel as well)
