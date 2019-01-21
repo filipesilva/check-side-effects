@@ -1,10 +1,3 @@
-node_modules
-dist
-
-# common testing files
-check-side-effects.tmp-input.js
-output.js
-output.js.map
-output-*.js
-output-*.js.map
-test.js
+node_modules/
+dist/
+testing/
