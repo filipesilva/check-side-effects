@@ -2,4 +2,5 @@ src/
 types/
 tsconfig.json
 dist/test.js
+dist/test.js.map
 testing/
