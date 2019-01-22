@@ -89,8 +89,9 @@ Below is a list of all available CLI options:
 --output                  Output the bundle to this path. Useful to trace the sourcemaps.
 --pure-getters            Assume there are no side effects from getters. [Default: true]
 --resolve-externals       Resolve external dependencies. [Default: false]
---use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
 --print-dependencies      Print all the module dependencies. [Default: false]
+--use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
+--use-minifier	          Run minifier over the final bundle. [Default: true]
 --warnings                Show all warnings. [Default: false]
 ```
 
@@ -114,6 +115,7 @@ const opts = {
   resolveExternals = false,
   printDependencies = false,
   useBuildOptimizer = true,
+  useMinifier = true,
   warnings = false,
 };
 

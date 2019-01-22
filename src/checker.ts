@@ -18,6 +18,7 @@ export interface CheckSideEffectsOptions {
   resolveExternals?: boolean;
   printDependencies?: boolean,
   useBuildOptimizer?: boolean,
+  useMinifier?: boolean,
   warnings?: boolean,
 }
 
@@ -31,6 +32,7 @@ export async function checkSideEffects({
   resolveExternals = false,
   printDependencies = false,
   useBuildOptimizer = true,
+  useMinifier = true,
   warnings = false,
 }: CheckSideEffectsOptions) {
 
@@ -90,7 +92,7 @@ export async function checkSideEffects({
     plugins: [
       ...(resolveExternals ? [nodeResolve()] : []),
       ...(useBuildOptimizer ? [buildOptimizer(buildOptimizerConfig)] : []),
-      terser(terserConfig),
+      ...(useMinifier ? [terser(terserConfig)] : []),
       ...(outputFilePath ? [filesize()] : []),
     ],
   };

@@ -11,17 +11,29 @@ export interface MainOptions {
 export async function main(opts: MainOptions) {
   // Parse the command line.
   const parsedArgs = minimist(opts.args, {
-    boolean: ['help', 'pureGetters', 'resolveExternals', 'printDependencies', 'warnings'],
+    boolean: [
+      'help', 
+      'pureGetters', 
+      'resolveExternals', 
+      'printDependencies', 
+      'use-build-optimizer',
+      'useMinifier',
+      'warnings',
+    ],
     string: ['cwd', 'output'],
     alias: {
       'pureGetters': 'pure-getters',
       'resolveExternals': 'resolve-externals',
       'printDependencies': 'print-dependencies',
+      'useBuildOptimizer': 'use-build-optimizer',
+      'useMinifier': 'use-minifier',
     },
     default: {
       'pureGetters': true,
       'resolveExternals': false,
       'printDependencies': false,
+      'useBuildOptimizer': true,
+      'useMinifier': true,
       'help': false,
       'warnings': false,
       'cwd': process.cwd(),
@@ -70,8 +82,9 @@ Options:
     --output                  Output the bundle to this path. Useful to trace the sourcemaps.
     --pure-getters            Assume there are no side effects from getters. [Default: true]
     --resolve-externals       Resolve external dependencies. [Default: false]
-    --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
     --print-dependencies      Print all the module dependencies. [Default: false]
+    --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
+    --use-minifier	          Run minifier over the final bundle. [Default: true]
     --warnings                Show all warnings. [Default: false]
 
 Example:
