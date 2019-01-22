@@ -16,7 +16,7 @@ export async function main(opts: MainOptions) {
       'pureGetters', 
       'resolveExternals', 
       'printDependencies', 
-      'use-build-optimizer',
+      'useBuildOptimizer',
       'useMinifier',
       'warnings',
     ],
@@ -59,6 +59,9 @@ export async function main(opts: MainOptions) {
     pureGetters: parsedArgs.pureGetters,
     resolveExternals: parsedArgs.assumeExternals,
     printDependencies: parsedArgs.printDependencies,
+    useBuildOptimizer: parsedArgs.useBuildOptimizer,
+    useMinifier: parsedArgs.useMinifier,
+    warnings: parsedArgs.warnings,
   };
 
   // Run it.
