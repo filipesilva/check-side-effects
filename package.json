@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "node dist/test.js",
-    "build": "tsc"
+    "build": "tsc",
+    "check-side-effects": "npm run build && node dist/cli.js"
   },
   "keywords": [],
   "author": "",
