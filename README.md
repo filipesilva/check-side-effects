@@ -103,7 +103,7 @@ You can also use this tool via the JavaScript API.
 This API provides you with more options than the CLI usage.
 
 ```js
-import { checkSideEffects } from './checker';
+import { checkSideEffects } from 'check-side-effects';
 
 const opts = {
   cwd = process.cwd(),
