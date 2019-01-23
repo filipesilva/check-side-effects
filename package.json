@@ -28,5 +28,6 @@
     "@types/minimist": "~1.2.0",
     "@types/terser": "~3.8.0",
     "typescript": "~3.2.4"
-  }
+  },
+  "typings": "./dist/checker.d.ts"
 }
