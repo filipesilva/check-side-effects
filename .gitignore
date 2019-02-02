@@ -1,3 +1,6 @@
 node_modules/
 dist/
 testing/
+check-side-effects.tmp-input.js
+output.js
+output.js.map
