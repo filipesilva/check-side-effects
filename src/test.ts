@@ -18,14 +18,6 @@ import { share } from "rxjs/operators";
 
 "undefined" !== typeof ngDevMode && ngDevMode;
 
-String;
-
-Function;
-
-String;
-
-String;
-
 `
 
 if (got != expected) {
