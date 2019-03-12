@@ -89,8 +89,6 @@ export async function main(opts: MainOptions) {
       // Run it.
       const result = await checkSideEffects(checkSideEffectsOptions);
       if (result != test.expected) {
-        console.log(JSON.stringify(result))
-        console.log(JSON.stringify(test.expected))
         failedExpectations.push(
           `\nFor modules ${test.esModules.join()}\n\n` +
           `Expected:\n${test.expected}\n\n` +
