@@ -1,6 +1,10 @@
 src/
 types/
 tsconfig.json
-dist/test.js
-dist/test.js.map
+node_modules/
+test/node_modules/
+test/
 testing/
+check-side-effects.tmp-input.js
+output.js
+output.js.map
