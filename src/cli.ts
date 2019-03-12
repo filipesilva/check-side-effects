@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { readFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
 import minimist from 'minimist';
 
 import { CheckSideEffectsOptions, checkSideEffects } from './checker';
@@ -8,19 +10,40 @@ export interface MainOptions {
   args: string[];
 }
 
+export interface Options {
+  cwd?: string;
+  output?: string;
+  pureGetters: boolean,
+  resolveExternals: boolean,
+  printDependencies: boolean,
+  useBuildOptimizer: boolean,
+  useMinifier: boolean,
+  warnings: boolean,
+}
+
+export interface Test {
+  esModules: string[],
+  options?: Options;
+  expected: string,
+}
+
+export interface TestJson {
+  tests: Test[],
+}
+
 export async function main(opts: MainOptions) {
   // Parse the command line.
   const parsedArgs = minimist(opts.args, {
     boolean: [
-      'help', 
-      'pureGetters', 
-      'resolveExternals', 
-      'printDependencies', 
+      'help',
+      'pureGetters',
+      'resolveExternals',
+      'printDependencies',
       'useBuildOptimizer',
       'useMinifier',
       'warnings',
     ],
-    string: ['cwd', 'output'],
+    string: ['cwd', 'output', 'test'],
     alias: {
       'pureGetters': 'pure-getters',
       'resolveExternals': 'resolve-externals',
@@ -46,26 +69,63 @@ export async function main(opts: MainOptions) {
     return;
   }
 
-  // Get the list of modules to check.
-  // When invoked as `node path/to/cli.js something` we need to strip the two starting arguments.
-  // When invoked as `binary something` we only need to strip the first starting argument.
-  const modules = isNodeBinary(parsedArgs._[0]) ? parsedArgs._.slice(2) : parsedArgs._.slice(1);
+  if (parsedArgs.test) {
+    // If there's a test file, use it instead of reading flags for options.
+    const testFile = resolve(parsedArgs.cwd, parsedArgs.test);
+    if (!existsSync(testFile)) {
+      throw `Could not find the test file: ${testFile}.`;
+    }
+    const testJson = JSON.parse(readFileSync(testFile, 'utf-8')) as TestJson;
+    const failedExpectations: string[] = [];
 
-  // Assemble the options.
-  const checkSideEffectsOptions: CheckSideEffectsOptions = {
-    esModules: modules,
-    cwd: parsedArgs.cwd,
-    outputFilePath: parsedArgs.output,
-    pureGetters: parsedArgs.pureGetters,
-    resolveExternals: parsedArgs.assumeExternals,
-    printDependencies: parsedArgs.printDependencies,
-    useBuildOptimizer: parsedArgs.useBuildOptimizer,
-    useMinifier: parsedArgs.useMinifier,
-    warnings: parsedArgs.warnings,
-  };
+    for (const test of testJson.tests) {
+      // Assemble the options.
+      const checkSideEffectsOptions: CheckSideEffectsOptions = {
+        esModules: test.esModules,
+        cwd: parsedArgs.cwd,
+        ...test.options
+      };
 
-  // Run it.
-  return checkSideEffects(checkSideEffectsOptions);
+      // Run it.
+      const result = await checkSideEffects(checkSideEffectsOptions);
+      if (result != test.expected) {
+        console.log(JSON.stringify(result))
+        console.log(JSON.stringify(test.expected))
+        failedExpectations.push(
+          `\nFor modules ${test.esModules.join()}\n\n` +
+          `Expected:\n${test.expected}\n\n` +
+          `Got:\n${result}\n\n`
+        );
+      }
+    }
+
+    if (failedExpectations.length > 0) {
+      throw `Tests failed: ${failedExpectations.join()}`;
+    } else {
+      console.log(`All tests passed.`)
+    }
+  } else {
+    // Get the list of modules to check.
+    // When invoked as `node path/to/cli.js something` we need to strip the two starting arguments.
+    // When invoked as `binary something` we only need to strip the first starting argument.
+    const modules = isNodeBinary(parsedArgs._[0]) ? parsedArgs._.slice(2) : parsedArgs._.slice(1);
+
+    // Assemble the options.
+    const checkSideEffectsOptions: CheckSideEffectsOptions = {
+      esModules: modules,
+      cwd: parsedArgs.cwd,
+      output: parsedArgs.output,
+      pureGetters: parsedArgs.pureGetters,
+      resolveExternals: parsedArgs.resolveExternals,
+      printDependencies: parsedArgs.printDependencies,
+      useBuildOptimizer: parsedArgs.useBuildOptimizer,
+      useMinifier: parsedArgs.useMinifier,
+      warnings: parsedArgs.warnings,
+    };
+
+    // Run it.
+    return checkSideEffects(checkSideEffectsOptions);
+  }
 }
 
 // Check if a given string looks like the node binary.
@@ -89,6 +149,7 @@ Options:
     --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
     --use-minifier	          Run minifier over the final bundle to remove comments. [Default: true]
     --warnings                Show all warnings. [Default: false]
+    --test                    Read a series of tests from a JSON file. [Default: false]
 
 Example:
     check-side-effects ./path/to/library/module.js

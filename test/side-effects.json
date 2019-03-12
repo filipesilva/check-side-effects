@@ -1,0 +1,10 @@
+{
+  "tests": [
+    {
+      "esModules": [
+        "./node_modules/@angular/core/esm5/core.js"
+      ],
+      "expected": "import \"tslib\";\n\nimport \"rxjs\";\n\nimport \"rxjs/operators\";\n"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "check-side-effects-test",
+  "version": "0.0.0",
+  "description": "Test suite for check-side-effects.",
+  "scripts": {
+    "test": "check-side-effects --test side-effects.json"
+  },
+  "dependencies": {
+    "check-side-effects": "file:../",
+    "@angular/core": "8.0.0-beta.7"
+  }
+}

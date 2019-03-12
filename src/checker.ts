@@ -11,7 +11,7 @@ import { MinifyOptions } from 'terser';
 export interface CheckSideEffectsOptions {
   cwd: string;
   esModules: string[];
-  outputFilePath?: string;
+  output?: string;
   pureGetters?: boolean;
   globalDefs?: { [s: string]: string; };
   sideEffectFreeModules?: string[],
@@ -25,7 +25,7 @@ export interface CheckSideEffectsOptions {
 export async function checkSideEffects({
   cwd,
   esModules,
-  outputFilePath,
+  output,
   pureGetters = true,
   globalDefs = {},
   sideEffectFreeModules = [''], // empty string assumes all modules are side effect free.
@@ -38,14 +38,14 @@ export async function checkSideEffects({
 
   // Resolve provided paths.
   const resolvedEsModules = esModules.map(m => resolve(cwd, m).replace(/\\/g, '/'));
-  if (outputFilePath) {
-    outputFilePath = resolve(cwd, outputFilePath);
+  let outputFilePath: string | undefined;
+  if (output) {
+    outputFilePath = resolve(cwd, output);
   }
 
   // Verify the modules exist.
   const missingModules = resolvedEsModules.filter(m => !existsSync(m));
   if (missingModules.length > 0) {
-
     throw `Could not find the following modules: ${missingModules.join()}.` +
     `\nPlease provide relative/absolute paths to the ES modules you want to check.`;
   }

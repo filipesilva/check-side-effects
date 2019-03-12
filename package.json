@@ -8,7 +8,7 @@
     "check-side-effects": "./dist/cli.js"
   },
   "scripts": {
-    "test": "node dist/test.js",
+    "test": "npm run build && cd test && npm install && npm test",
     "build": "tsc",
     "check-side-effects": "npm run build && node dist/cli.js"
   },

@@ -1,4 +1,5 @@
 node_modules/
+test/node_modules/
 dist/
 testing/
 check-side-effects.tmp-input.js
