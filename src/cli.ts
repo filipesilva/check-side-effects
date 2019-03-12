@@ -87,7 +87,7 @@ Options:
     --resolve-externals       Resolve external dependencies. [Default: false]
     --print-dependencies      Print all the module dependencies. [Default: false]
     --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
-    --use-minifier	          Run minifier over the final bundle. [Default: true]
+    --use-minifier	          Run minifier over the final bundle to remove comments. [Default: true]
     --warnings                Show all warnings. [Default: false]
 
 Example:

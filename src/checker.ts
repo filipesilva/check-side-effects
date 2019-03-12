@@ -46,7 +46,7 @@ export async function checkSideEffects({
   const missingModules = resolvedEsModules.filter(m => !existsSync(m));
   if (missingModules.length > 0) {
 
-    throw `Could not find the following modules: ${missingModules.join()}.` + 
+    throw `Could not find the following modules: ${missingModules.join()}.` +
     `\nPlease provide relative/absolute paths to the ES modules you want to check.`;
   }
 
@@ -55,31 +55,18 @@ export async function checkSideEffects({
   const tmpInputFilename = resolve(cwd, './check-side-effects.tmp-input.js');
   writeFileSync(tmpInputFilename, resolvedEsModules.map(m => `import '${m}';`).join('\n'));
 
-  // Terser config for side effect detection.
+  // Terser config to remove comments and beautify output.
   const terserConfig: MinifyOptions = {
-    module: true, // assume code is a ES module (implies toplevel as well)
-    ecma: 6, // enable ES2015 optimizations
     mangle: false,
+    compress: {
+      // Override defaults to disable all optimizations.
+      // We only want to use global_defs.
+      defaults: false,
+      global_defs: globalDefs, // assume these variables are defined as the value provided
+    },
     output: {
       comments: false,
       beautify: true,
-    },
-    compress: {
-      // Override defaults to disable most optimizations.
-      // We only want to use the minimum needed for side-effect detection.
-      defaults: false,
-
-      // Set options specifically for dropping side-effect free code.
-      conditionals: true, // optimize conditionals
-      unused: true, // drop unreferenced vars/funcs
-      side_effects: true, // drop functions marked as pure
-      pure_getters: pureGetters, // assume prop access has no side effects
-      passes: 3, // run compress 3 times
-      global_defs: globalDefs, // asume these variables are defined as the value provided
-      reduce_vars: true, // optimization on variables assigned with and used as constant values
-      reduce_funcs: true, // allows single-use functions to be inlined as function expressions
-      evaluate: true, // evaluate constant expressions
-      dead_code: true, // drop dead code
     },
   };
 
@@ -95,6 +82,11 @@ export async function checkSideEffects({
       ...(useMinifier ? [terser(terserConfig)] : []),
       ...(outputFilePath ? [filesize()] : []),
     ],
+    treeshake: {
+      propertyReadSideEffects: pureGetters,
+      pureExternalModules: false,
+      annotations: true,
+    }
   };
 
   if (!warnings) {

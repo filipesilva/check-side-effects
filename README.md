@@ -51,8 +51,8 @@ It implements that idea by following these steps:
   - convert known 
 [TypeScript](https://www.typescriptlang.org/) generated code with side effects to the equivalent 
 without side effects
-- setup [Terser](https://github.com/terser-js/terser) to remove as many symbols as possible
-- run [Rollup](https://rollupjs.org) over that file
+- setup [Terser](https://github.com/terser-js/terser) to remove remove comments
+- run [Rollup](https://rollupjs.org) over that file with tree shaking turned on
 
 ## CLI Usage
 
@@ -91,7 +91,7 @@ Below is a list of all available CLI options:
 --resolve-externals       Resolve external dependencies. [Default: false]
 --print-dependencies      Print all the module dependencies. [Default: false]
 --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
---use-minifier	          Run minifier over the final bundle. [Default: true]
+--use-minifier	          Run minifier over the final bundle to remove comments. [Default: true]
 --warnings                Show all warnings. [Default: false]
 ```
 
