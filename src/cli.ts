@@ -89,16 +89,14 @@ export async function main(opts: MainOptions) {
       // Run it.
       const result = await checkSideEffects(checkSideEffectsOptions);
       if (result != test.expected) {
-        failedExpectations.push(
-          `\nFor modules ${test.esModules.join()}\n\n` +
-          `Expected:\n${test.expected}\n\n` +
-          `Got:\n${result}\n\n`
-        );
+        failedExpectations.push(test.esModules.join(' '));
       }
     }
 
     if (failedExpectations.length > 0) {
-      throw `Tests failed: ${failedExpectations.join()}`;
+      throw `Tests failed for modules:\n` +
+      `${failedExpectations.join('\n')}` +
+      `\n\nRun 'check-side-effects path-to-modules' individually to check results.\n`;
     } else {
       console.log(`All tests passed.`)
     }
