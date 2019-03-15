@@ -140,7 +140,7 @@ export async function main(rawOpts: MainOptions) {
         console.log(`Tests updated for modules:\n${failedExpectationsDescription}\n`)
       } else {
         throw `Tests failed for modules:\n${failedExpectationsDescription}\n` +
-        `\nRun 'check-side-effects --test --update' to update the expectations.\n`;
+        `\nTo update the expectations, run this command again with the --update flag.\n`;
       }
     } else {
       console.log(`All tests passed.`)
