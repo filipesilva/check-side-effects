@@ -11,7 +11,7 @@
     "test": "npm run build && cd test && npm install && npm test",
     "build": "tsc",
     "check-side-effects": "npm run build && node dist/cli.js",
-    "release": "npm version -m \"release: %\""
+    "release": "npm run build && npm version -m \"release: %\""
   },
   "keywords": [],
   "author": "",
