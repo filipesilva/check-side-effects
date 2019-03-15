@@ -138,7 +138,7 @@ export async function main(rawOpts: MainOptions) {
       const failedExpectationsDescription = failedExpectations.map(s => `  ${s}`).join('\n');
 
       if (options.update) {
-        console.log(`Tests updated for modules:\n${failedExpectationsDescription}\n`)
+        console.log(`Test expectations updated for modules:\n${failedExpectationsDescription}\n`)
       } else {
         throw `Tests failed for modules:\n${failedExpectationsDescription}\n` +
         `\nTo update the expectations, run this command again with the --update flag.\n`;
@@ -153,7 +153,7 @@ export async function main(rawOpts: MainOptions) {
     const esModules = isNodeBinary(options._[0]) ? options._.slice(2) : options._.slice(1);
 
     if (esModules.length == 0) {
-      throw `You must provide at least one ES module.`
+      throw `You must provide at least one ES module. Use --help for usage information.`
     }
 
     // Assemble the options.
