@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Test suite for check-side-effects.",
   "scripts": {
-    "test": "check-side-effects --test side-effects.json"
+    "test": "check-side-effects --test side-effects.json --update"
   },
   "dependencies": {
     "check-side-effects": "file:../",

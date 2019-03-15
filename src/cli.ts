@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
+import { resolve, dirname } from 'path';
 import minimist from 'minimist';
 
 import { CheckSideEffectsOptions, checkSideEffects } from './checker';
@@ -125,6 +125,7 @@ export async function main(rawOpts: MainOptions) {
       if (result != expectedOutput) {
         failedExpectations.push(esModulesDescription);
         if (options.update) {
+          _recursiveMkDir(dirname(expectedOutputPath));
           writeFileSync(expectedOutputPath, result, 'utf-8');
         }
       }
@@ -201,6 +202,13 @@ Example:
     check-side-effects ./path/to/library/module.js
 `;
   console.log(helpText);
+}
+
+function _recursiveMkDir(path: string) {
+  if (!existsSync(path)) {
+    _recursiveMkDir(dirname(path));
+    mkdirSync(path);
+  }
 }
 
 // Run only if this is entry point for node.
