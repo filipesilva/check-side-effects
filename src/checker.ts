@@ -2,7 +2,6 @@ import { resolve } from 'path';
 import { writeFileSync, unlinkSync, existsSync } from 'fs';
 import { OutputOptions, OutputAsset, rollup, InputOptions } from 'rollup';
 import nodeResolve from 'rollup-plugin-node-resolve';
-import filesize from 'rollup-plugin-filesize';
 import { terser } from 'rollup-plugin-terser';
 import buildOptimizer from '@angular-devkit/build-optimizer/src/build-optimizer/rollup-plugin.js';
 import { MinifyOptions } from 'terser';
@@ -80,7 +79,6 @@ export async function checkSideEffects({
       ...(resolveExternals ? [nodeResolve()] : []),
       ...(useBuildOptimizer ? [buildOptimizer(buildOptimizerConfig)] : []),
       ...(useMinifier ? [terser(terserConfig)] : []),
-      ...(outputFilePath ? [filesize()] : []),
     ],
     treeshake: {
       propertyReadSideEffects: pureGetters,
