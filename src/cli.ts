@@ -114,7 +114,7 @@ export async function main(rawOpts: MainOptions) {
       // Load the expected output. 
       const expectedOutputPath = resolve(options.cwd, test.expectedOutput);
       let expectedOutput;
-      if (existsSync(testPath)) {
+      if (existsSync(expectedOutputPath)) {
         expectedOutput = readFileSync(expectedOutputPath, 'utf-8');
       } else {
         // Don't error out if the file isn't out, because they can be updated afterwards.
