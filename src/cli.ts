@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import minimist from 'minimist';
@@ -209,15 +208,4 @@ function _recursiveMkDir(path: string) {
     _recursiveMkDir(dirname(path));
     mkdirSync(path);
   }
-}
-
-// Run only if this is entry point for node.
-// This way the file can be imported without running anything.
-if (require.main === module) {
-  main({ args: process.argv })
-    .then(output => !!output ? console.log(output) : null)
-    .catch(e => {
-      console.error(e.msg ? e.msg : e);
-      process.exitCode = 1;
-    });
 }

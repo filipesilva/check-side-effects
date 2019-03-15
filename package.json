@@ -5,7 +5,7 @@
   "repository": "https://github.com/filipesilva/check-side-effects",
   "main": "dist/checker.js",
   "bin": {
-    "check-side-effects": "./dist/cli.js"
+    "check-side-effects": "./bin/check-side-effects"
   },
   "scripts": {
     "test": "npm run build && cd test && npm install && npm test",
