@@ -122,6 +122,9 @@ export async function checkSideEffects({
   } else {
     const { output } = await bundle.generate(outputOptions);
 
+    // Delete the temporary input file.
+    unlinkSync(tmpInputFilename);
+
     // Return the chunk code.
     return output
       .filter(chunkOrAsset => !(chunkOrAsset as OutputAsset).isAsset)
