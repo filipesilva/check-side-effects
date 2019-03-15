@@ -86,18 +86,19 @@ If you want to check against expected side effects you can use the `check-side-e
 {
   "tests": [
     {
-      "esModules": [
-        "./path/to/library/module.js",
-        "./path/to/another-library/module.js"
-      ],
+      "esModules": "./path/to/library/module.js",
       "options": {},
-      "expected": ""
+      "expectedOutput": "./path/to/expected-output.js"
     }
   ]
 }
 ```
 
-`options` accept the same options as the CLI, expect `help`, but in [Camel Case](https://en.wikipedia.org/wiki/Camel_case).
+- `esModules` accepts a string or array of strings
+- `expectedOutput` is a path to the expected output.
+- `options` accept the same options as the CLI, but in [Camel Case](https://en.wikipedia.org/wiki/Camel_case).
+
+You can also pass the `--update` flag to update the expected outputs for failing tests.
 
 ## API usage
 

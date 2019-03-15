@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 import minimist from 'minimist';
 
@@ -10,7 +10,7 @@ export interface MainOptions {
   args: string[];
 }
 
-export interface Options {
+export interface CheckerCLIOptions {
   cwd?: string;
   output?: string;
   pureGetters: boolean,
@@ -21,19 +21,31 @@ export interface Options {
   warnings: boolean,
 }
 
+export interface TestCLIOptions {
+  test?: string,
+  update: boolean,
+}
+
 export interface Test {
-  esModules: string[],
-  options?: Options;
-  expected: string,
+  esModules: string | string[],
+  options?: CheckerCLIOptions;
+  expectedOutput: string,
 }
 
 export interface TestJson {
   tests: Test[],
 }
 
-export async function main(opts: MainOptions) {
+export type ParsedCliOptions = CheckerCLIOptions & TestCLIOptions & {
+  help: boolean;
+  cwd: string;
+  // _ is the ES module list.
+  _: string[];
+};
+
+export async function main(rawOpts: MainOptions) {
   // Parse the command line.
-  const parsedArgs = minimist(opts.args, {
+  const options = minimist(rawOpts.args, {
     boolean: [
       'help',
       'pureGetters',
@@ -42,6 +54,7 @@ export async function main(opts: MainOptions) {
       'useBuildOptimizer',
       'useMinifier',
       'warnings',
+      'update',
     ],
     string: ['cwd', 'output', 'test'],
     alias: {
@@ -59,44 +72,76 @@ export async function main(opts: MainOptions) {
       'useMinifier': true,
       'help': false,
       'warnings': false,
+      'update': false,
       'cwd': process.cwd(),
     },
     '--': true
-  });
+  }) as unknown as ParsedCliOptions;
 
-  if (parsedArgs.help) {
+  if (options.help) {
     showHelp();
     return;
   }
 
-  if (parsedArgs.test) {
+  if (options.test) {
     // If there's a test file, use it instead of reading flags for options.
-    const testFile = resolve(parsedArgs.cwd, parsedArgs.test);
-    if (!existsSync(testFile)) {
-      throw `Could not find the test file: ${testFile}.`;
+    const testPath = resolve(options.cwd, options.test);
+    if (!existsSync(testPath)) {
+      throw `Could not find the test file: ${testPath}.`;
     }
-    const testJson = JSON.parse(readFileSync(testFile, 'utf-8')) as TestJson;
+
+    console.log(`Loading tests from ${testPath}\n`);
+    const testJson = JSON.parse(readFileSync(testPath, 'utf-8')) as TestJson;
     const failedExpectations: string[] = [];
 
     for (const test of testJson.tests) {
+      const esModules = Array.isArray(test.esModules) ? test.esModules : [test.esModules];
+      const esModulesDescription = esModules.join(' ');
+
+      // These tests can take a while. Inform the user of progress.
+      console.log(`Testing ${esModulesDescription}`);
+
       // Assemble the options.
       const checkSideEffectsOptions: CheckSideEffectsOptions = {
-        esModules: test.esModules,
-        cwd: parsedArgs.cwd,
+        esModules,
+        cwd: options.cwd,
         ...test.options
       };
 
       // Run it.
       const result = await checkSideEffects(checkSideEffectsOptions);
-      if (result != test.expected) {
-        failedExpectations.push(test.esModules.join(' '));
+
+      // Load the expected output. 
+      const expectedOutputPath = resolve(options.cwd, test.expectedOutput);
+      let expectedOutput;
+      if (existsSync(testPath)) {
+        expectedOutput = readFileSync(expectedOutputPath, 'utf-8');
+      } else {
+        // Don't error out if the file isn't out, because they can be updated afterwards.
+        expectedOutput = '';
+      }
+
+      // Check against the expectation.
+      if (result != expectedOutput) {
+        failedExpectations.push(esModulesDescription);
+        if (options.update) {
+          writeFileSync(expectedOutputPath, result, 'utf-8');
+        }
       }
     }
 
+    // Print a newline before the results.
+    console.log('');
+
     if (failedExpectations.length > 0) {
-      throw `Tests failed for modules:\n` +
-      `${failedExpectations.join('\n')}` +
-      `\n\nRun 'check-side-effects path-to-modules' individually to check results.\n`;
+      const failedExpectationsDescription = failedExpectations.map(s => `  ${s}`).join('\n');
+
+      if (options.update) {
+        console.log(`Tests updated for modules:\n${failedExpectationsDescription}\n`)
+      } else {
+        throw `Tests failed for modules:\n${failedExpectationsDescription}\n` +
+        `\nRun 'check-side-effects --test --update' to update the expectations.\n`;
+      }
     } else {
       console.log(`All tests passed.`)
     }
@@ -104,19 +149,23 @@ export async function main(opts: MainOptions) {
     // Get the list of modules to check.
     // When invoked as `node path/to/cli.js something` we need to strip the two starting arguments.
     // When invoked as `binary something` we only need to strip the first starting argument.
-    const modules = isNodeBinary(parsedArgs._[0]) ? parsedArgs._.slice(2) : parsedArgs._.slice(1);
+    const esModules = isNodeBinary(options._[0]) ? options._.slice(2) : options._.slice(1);
+
+    if (esModules.length == 0) {
+      throw `You must provide at least one ES module.`
+    }
 
     // Assemble the options.
     const checkSideEffectsOptions: CheckSideEffectsOptions = {
-      esModules: modules,
-      cwd: parsedArgs.cwd,
-      output: parsedArgs.output,
-      pureGetters: parsedArgs.pureGetters,
-      resolveExternals: parsedArgs.resolveExternals,
-      printDependencies: parsedArgs.printDependencies,
-      useBuildOptimizer: parsedArgs.useBuildOptimizer,
-      useMinifier: parsedArgs.useMinifier,
-      warnings: parsedArgs.warnings,
+      esModules,
+      cwd: options.cwd,
+      output: options.output,
+      pureGetters: options.pureGetters,
+      resolveExternals: options.resolveExternals,
+      printDependencies: options.printDependencies,
+      useBuildOptimizer: options.useBuildOptimizer,
+      useMinifier: options.useMinifier,
+      warnings: options.warnings,
     };
 
     // Run it.
@@ -145,7 +194,8 @@ Options:
     --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
     --use-minifier	          Run minifier over the final bundle to remove comments. [Default: true]
     --warnings                Show all warnings. [Default: false]
-    --test                    Read a series of tests from a JSON file. [Default: false]
+    --test                    Read a series of tests from a JSON file.
+    --update                  Update the test results. [Default: false]
 
 Example:
     check-side-effects ./path/to/library/module.js
