@@ -25,7 +25,7 @@ export async function checkSideEffects({
   cwd,
   esModules,
   output,
-  pureGetters = true,
+  pureGetters = false,
   globalDefs = {},
   sideEffectFreeModules = [''], // empty string assumes all modules are side effect free.
   resolveExternals = false,

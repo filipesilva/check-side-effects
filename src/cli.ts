@@ -64,7 +64,7 @@ export async function main(rawOpts: MainOptions) {
       'useMinifier': 'use-minifier',
     },
     default: {
-      'pureGetters': true,
+      'pureGetters': false,
       'resolveExternals': false,
       'printDependencies': false,
       'useBuildOptimizer': true,
@@ -188,7 +188,7 @@ Options:
     --help                    Show this message.
     --cwd                     Override working directory to run the process in.
     --output                  Output the bundle to this path. Useful to trace the sourcemaps.
-    --pure-getters            Assume there are no side effects from getters. [Default: true]
+    --pure-getters            Assume there are no side effects from getters. [Default: false]
     --resolve-externals       Resolve external dependencies. [Default: false]
     --print-dependencies      Print all the module dependencies. [Default: false]
     --use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
