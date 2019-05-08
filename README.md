@@ -125,3 +125,11 @@ const opts = {
 
 const result = await checkSideEffects(opts);
 ```
+
+
+## Developing on this repository
+
+To build, run `npm run build`. To test, run `npm run test`.
+
+To release, run `npm run release <release-type>` where `<release-type>` is one of `patch`, `minor`
+or `major`.
