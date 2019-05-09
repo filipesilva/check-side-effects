@@ -1,6 +1,6 @@
 {
   "name": "check-side-effects",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Check if a ES module has side effects.",
   "repository": "https://github.com/filipesilva/check-side-effects",
   "main": "dist/checker.js",
