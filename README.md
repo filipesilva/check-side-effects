@@ -126,10 +126,29 @@ const opts = {
 const result = await checkSideEffects(opts);
 ```
 
+## TSLint rules
+
+Included you can find a [TSLint](https://palantir.github.io/tslint/) rule to detect toplevel property access.
+
+You can use it by adding the path below to `rulesDirectory` and the `no-toplevel-property-access` rule. Path fragments to include are optional and, if omitted, all TS files will be checked.
+
+```json
+{
+  "rulesDirectory": [
+    "node_modules/check-side-effects/dist/tslint"
+  ],
+  "rules": {
+    "no-toplevel-property-access": [
+      true,
+      "/path/fragments/to/include/",
+      "/another/path/fragment/to/include/"
+    ]
+  }
+}
+```
 
 ## Developing on this repository
 
 To build, run `npm run build`. To test, run `npm run test`.
 
-To release, run `npm run release <release-type>` where `<release-type>` is one of `patch`, `minor`
-or `major`.
+To release, run `npm run release <release-type>` where `<release-type>` is one of `patch`, `minor` or `major`.
