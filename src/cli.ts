@@ -84,18 +84,20 @@ export async function main(rawOpts: MainOptions) {
 
   if (options.test) {
     // If there's a test file, use it instead of reading flags for options.
-    const testPath = resolve(options.cwd, options.test);
-    if (!existsSync(testPath)) {
-      throw `Could not find the test file: ${testPath}.`;
+    const testFilePath = resolve(options.cwd, options.test);
+    if (!existsSync(testFilePath)) {
+      throw `Could not find the test file: ${testFilePath}.`;
     }
 
-    console.log(`Loading tests from ${testPath}\n`);
-    const testJson = JSON.parse(readFileSync(testPath, 'utf-8')) as TestJson;
+    console.log(`Loading tests from ${testFilePath}\n`);
+    const testJson = JSON.parse(readFileSync(testFilePath, 'utf-8')) as TestJson;
+    const testFileDir = dirname(testFilePath);
     const failedExpectations: string[] = [];
 
     for (const test of testJson.tests) {
-      const esModules = Array.isArray(test.esModules) ? test.esModules : [test.esModules];
-      const esModulesDescription = esModules.join(' ');
+      const unresolvedEsModules = Array.isArray(test.esModules) ? test.esModules : [test.esModules];
+      const esModules = unresolvedEsModules.map(esm => resolve(testFileDir, esm));
+      const esModulesDescription = unresolvedEsModules.join(' ');
 
       // These tests can take a while. Inform the user of progress.
       console.log(`Testing ${esModulesDescription}`);
