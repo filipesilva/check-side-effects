@@ -113,7 +113,7 @@ export async function main(rawOpts: MainOptions) {
       const result = await checkSideEffects(checkSideEffectsOptions);
 
       // Load the expected output. 
-      const expectedOutputPath = resolve(options.cwd, test.expectedOutput);
+      const expectedOutputPath = resolve(testFileDir, test.expectedOutput);
       let expectedOutput;
       if (existsSync(expectedOutputPath)) {
         expectedOutput = readFileSync(expectedOutputPath, 'utf-8');
