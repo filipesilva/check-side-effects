@@ -1,5 +1,6 @@
-// Normally `ts` and `tslint` should be peerDependencies, but we're not adding them because
-// it should be optional to use this tslint rule.
+// `ts` and `tslint` are peerDependencies, but they really should be optionalPeerDependencies
+// instead. That doesn't exist though, so projects might get a missing peerdep error.
+// I'm trying not too think too hard about this problem though, since tslint is going away soon.
 import { IRuleMetadata, RuleFailure, WalkContext } from 'tslint/lib';
 import { AbstractRule } from 'tslint/lib/rules';
 import {

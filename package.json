@@ -29,5 +29,9 @@
     "tslib": "~1.9.3",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "tslint": ">=5.0.0",
+    "typescript": ">=3.0.0"
   }
 }
