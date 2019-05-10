@@ -11,7 +11,7 @@ export interface CheckSideEffectsOptions {
   cwd: string;
   esModules: string[];
   output?: string;
-  pureGetters?: boolean;
+  propertyReadSideEffects?: boolean;
   globalDefs?: { [s: string]: string; };
   sideEffectFreeModules?: string[],
   resolveExternals?: boolean;
@@ -22,10 +22,10 @@ export interface CheckSideEffectsOptions {
 }
 
 export async function checkSideEffects({
-  cwd,
-  esModules,
+  cwd = process.cwd(),
+  esModules, // string or string array
   output,
-  pureGetters = false,
+  propertyReadSideEffects = true,
   globalDefs = {},
   sideEffectFreeModules = [''], // empty string assumes all modules are side effect free.
   resolveExternals = false,
@@ -81,7 +81,9 @@ export async function checkSideEffects({
       ...(useMinifier ? [terser(terserConfig)] : []),
     ],
     treeshake: {
-      propertyReadSideEffects: pureGetters,
+      // propertyReadSideEffects true assumes that getters might have side effects,
+      // while false assumes that getters never have side effects.
+      propertyReadSideEffects,
       pureExternalModules: false,
       annotations: true,
     }

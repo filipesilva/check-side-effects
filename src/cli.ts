@@ -12,7 +12,7 @@ export interface MainOptions {
 export interface CheckerCLIOptions {
   cwd?: string;
   output?: string;
-  pureGetters: boolean,
+  propertyReadSideEffects: boolean,
   resolveExternals: boolean,
   printDependencies: boolean,
   useBuildOptimizer: boolean,
@@ -47,7 +47,7 @@ export async function main(rawOpts: MainOptions) {
   const options = minimist(rawOpts.args, {
     boolean: [
       'help',
-      'pureGetters',
+      'propertyReadSideEffects',
       'resolveExternals',
       'printDependencies',
       'useBuildOptimizer',
@@ -57,14 +57,14 @@ export async function main(rawOpts: MainOptions) {
     ],
     string: ['cwd', 'output', 'test'],
     alias: {
-      'pureGetters': 'pure-getters',
+      'propertyReadSideEffects': 'property-read-side-effects',
       'resolveExternals': 'resolve-externals',
       'printDependencies': 'print-dependencies',
       'useBuildOptimizer': 'use-build-optimizer',
       'useMinifier': 'use-minifier',
     },
     default: {
-      'pureGetters': false,
+      'propertyReadSideEffects': true,
       'resolveExternals': false,
       'printDependencies': false,
       'useBuildOptimizer': true,
@@ -162,7 +162,7 @@ export async function main(rawOpts: MainOptions) {
       esModules,
       cwd: options.cwd,
       output: options.output,
-      pureGetters: options.pureGetters,
+      propertyReadSideEffects: options.propertyReadSideEffects,
       resolveExternals: options.resolveExternals,
       printDependencies: options.printDependencies,
       useBuildOptimizer: options.useBuildOptimizer,

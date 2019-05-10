@@ -14,9 +14,9 @@ An obvious example of a side effect is top level function calls, like logging. I
 
 Similarly, if you call `myFunction()` on the top level and static analysis cannot determine that call to have no effect, the code will be retained.
 
-A more subtle side effect is property access, like `const obj = {}; obj.prop;`. `obj` isn't really used, and it's not even exported. But because something might be happening on the property getter, it's retained in the final bundle.
+A more subtle side effect is property read, like `const obj = {}; obj.prop;`. `obj` isn't really used, and it's not even exported. But because something might be happening on the property read, it's retained in the final bundle.
 
-It's incommon to have size effects on getters and for that reason some tools offer a configuration option to assume property getters have no side effects.
+It's incommon to have size effects on property read and for that reason some tools offer a configuration option to assume property reads have no side effects.
 
 These examples are trivial but on complex pieces of software you will likely find non-trivial variations of the same theme.
 
@@ -66,16 +66,16 @@ check-side-effects ./path/to/library/module.js --output side-effects.js
 Below is a list of all available CLI options:
 
 ```
---help                    Show the help message.
---cwd                     Override working directory to run the process in.
---output                  Output the bundle to this path. Useful to trace the sourcemaps.
---pure-getters            Assume there are no side effects from getters. [Default: true]
---resolve-externals       Resolve external dependencies. [Default: false]
---print-dependencies      Print all the module dependencies. [Default: false]
---use-build-optimizer     Run Build Optimizer over all modules. [Default: true]
---use-minifier            Run minifier over the final bundle to remove comments. [Default: true]
---warnings                Show all warnings. [Default: false]
---test                    Read a series of tests from a JSON file. [Default: false]
+--help                        Show the help message.
+--cwd                         Override working directory to run the process in.
+--output                      Output the bundle to this path. Useful to trace the sourcemaps.
+--property-read-side-effects  Assume there are side effects from property reads. [Default: true]
+--resolve-externals           Resolve external dependencies. [Default: false]
+--print-dependencies          Print all the module dependencies. [Default: false]
+--use-build-optimizer         Run Build Optimizer over all modules. [Default: true]
+--use-minifier                Run minifier over the final bundle to remove comments. [Default: true]
+--warnings                    Show all warnings. [Default: false]
+--test                        Read a series of tests from a JSON file. [Default: false]
 ```
 
 ### Test mode
@@ -109,11 +109,13 @@ This API provides you with more options than the CLI usage.
 ```javascript
 import { checkSideEffects } from './checker';
 
+const cwd = process.cwd
+
 const opts = {
   cwd = process.cwd(),
-  esModules = ['./path/to/library/module.js'],
-  output = undefined,
-  pureGetters = true,
+  esModules, // string or string array
+  output,
+  propertyReadSideEffects = true,
   globalDefs = {},
   sideEffectFreeModules = [''], // empty string assumes all modules are side effect free.
   resolveExternals = false,
@@ -149,6 +151,8 @@ You can use it by adding the path below to `rulesDirectory` and the `no-toplevel
 
 ## Developing on this repository
 
-To build, run `npm run build`. To test, run `npm run test`.
+To build, run `npm run build`. 
+
+To test, run `npm run test`. If you need to update the test snapshots, run `cd test && npm test -- --update`.
 
 To release, run `npm run release <release-type>` where `<release-type>` is one of `patch`, `minor` or `major`.

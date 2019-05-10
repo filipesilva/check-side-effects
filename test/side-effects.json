@@ -2,11 +2,25 @@
   "tests": [
     {
       "esModules": "./node_modules/@angular/core/esm5/core.js",
-      "expectedOutput": "./core/esm5.js"
+      "expectedOutput": "./snapshots/angular-core/esm5.js"
     },
     {
       "esModules": "./node_modules/@angular/core/fesm5/core.js",
-      "expectedOutput": "./core/esm5.js"
+      "expectedOutput": "./snapshots/angular-core/esm5.js"
+    },
+    {
+      "esModules": "./property-read.js",
+      "expectedOutput": "./snapshots/prop-read/true.js",
+      "options": {
+        "propertyReadSideEffects": true
+      }
+    },
+    {
+      "esModules": "./property-read.js",
+      "expectedOutput": "./snapshots/prop-read/false.js",
+      "options": {
+        "propertyReadSideEffects": false
+      }
     }
   ]
 }

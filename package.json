@@ -19,8 +19,8 @@
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.14.0-beta.5",
     "minimist": "~1.2.0",
-    "rollup": "~1.6.0",
-    "rollup-plugin-node-resolve": "~4.0.1",
+    "rollup": "~1.11.3",
+    "rollup-plugin-node-resolve": "~4.2.3",
     "rollup-plugin-terser": "~4.0.4",
     "tslib": "~1.9.3",
     "tslint": "^5.16.0",
