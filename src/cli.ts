@@ -152,7 +152,9 @@ export async function main(rawOpts: MainOptions) {
         console.log(`${failedExpectations.length} test expectations updated.\n`);
       } else {
         console.log(`${failedExpectations.length} tests failed, see above for diffs.`);
-        console.log(`To update the expectations, run this command again with the --update flag.`);
+        console.log(`To update the expectations, run this command again with the --update flag:`);
+        console.log(``);
+        console.log(`  ${rawOpts.args.join(' ')} --update`);
         throw ``;
       }
     } else {
