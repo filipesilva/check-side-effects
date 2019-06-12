@@ -36,6 +36,11 @@ export interface TestJson {
   tests: Test[];
 }
 
+interface FailedExpectation {
+  testDescription: string;
+  diff: string;
+}
+
 export type ParsedCliOptions = CheckerCLIOptions & TestCLIOptions & {
   help: boolean;
   cwd: string;
@@ -93,7 +98,7 @@ export async function main(rawOpts: MainOptions) {
     console.log(`Loading tests from ${testFilePath}\n`);
     const testJson = JSON.parse(readFileSync(testFilePath, 'utf-8')) as TestJson;
     const testFileDir = dirname(testFilePath);
-    const failedExpectations: string[] = [];
+    const failedExpectations: FailedExpectation[] = [];
 
     for (const test of testJson.tests) {
       const unresolvedEsModules = Array.isArray(test.esModules) ? test.esModules : [test.esModules];
@@ -126,7 +131,7 @@ export async function main(rawOpts: MainOptions) {
       // Check against the expectation.
       if (result != expectedOutput) {
         const diff = createPatch(expectedOutputPath, expectedOutput, result);
-        failedExpectations.push(diff);
+        failedExpectations.push({ testDescription: modulesDescription, diff });
         if (options.update) {
           _recursiveMkDir(dirname(expectedOutputPath));
           writeFileSync(expectedOutputPath, result, 'utf-8');
@@ -139,7 +144,8 @@ export async function main(rawOpts: MainOptions) {
 
     if (failedExpectations.length > 0) {
       console.log('The following snapshots have changed:\n\n')
-      console.log(failedExpectations.map(diff => `${diff}\n`).join('\n'));
+      console.log(failedExpectations
+        .map(s => `Snapshot for ${s.testDescription} changed:\n\n${s.diff}\n`).join('\n'));
 
       if (options.update) {
         console.log(`${failedExpectations.length} test expectations updated.\n`);
