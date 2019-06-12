@@ -1,5 +1,6 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
+import { createPatch } from 'diff';
 import minimist from 'minimist';
 
 import { CheckSideEffectsOptions, checkSideEffects } from './checker';
@@ -32,7 +33,12 @@ export interface Test {
 }
 
 export interface TestJson {
-  tests: Test[],
+  tests: Test[];
+}
+
+interface FailedExpectation {
+  fileName: string;
+  diff: string;
 }
 
 export type ParsedCliOptions = CheckerCLIOptions & TestCLIOptions & {
@@ -92,15 +98,15 @@ export async function main(rawOpts: MainOptions) {
     console.log(`Loading tests from ${testFilePath}\n`);
     const testJson = JSON.parse(readFileSync(testFilePath, 'utf-8')) as TestJson;
     const testFileDir = dirname(testFilePath);
-    const failedExpectations: string[] = [];
+    const failedExpectations: FailedExpectation[] = [];
 
     for (const test of testJson.tests) {
       const unresolvedEsModules = Array.isArray(test.esModules) ? test.esModules : [test.esModules];
       const esModules = unresolvedEsModules.map(esm => resolve(testFileDir, esm));
-      const esModulesDescription = unresolvedEsModules.join(' ');
+      const modulesDescription = unresolvedEsModules.join(' ');
 
       // These tests can take a while. Inform the user of progress.
-      console.log(`Testing ${esModulesDescription}`);
+      console.log(`Testing ${modulesDescription}`);
 
       // Assemble the options.
       const checkSideEffectsOptions: CheckSideEffectsOptions = {
@@ -109,8 +115,8 @@ export async function main(rawOpts: MainOptions) {
         ...test.options
       };
 
-      // Run it.
-      const result = await checkSideEffects(checkSideEffectsOptions);
+      // Run it. Cast output as string because we're not outputFilePath. Right? Probably right.
+      const result = await checkSideEffects(checkSideEffectsOptions) as string;
 
       // Load the expected output. 
       const expectedOutputPath = resolve(testFileDir, test.expectedOutput);
@@ -124,7 +130,8 @@ export async function main(rawOpts: MainOptions) {
 
       // Check against the expectation.
       if (result != expectedOutput) {
-        failedExpectations.push(esModulesDescription);
+        const diff = createPatch(expectedOutputPath, expectedOutput, result);
+        failedExpectations.push({ fileName: expectedOutputPath, diff });
         if (options.update) {
           _recursiveMkDir(dirname(expectedOutputPath));
           writeFileSync(expectedOutputPath, result, 'utf-8');
@@ -136,13 +143,17 @@ export async function main(rawOpts: MainOptions) {
     console.log('');
 
     if (failedExpectations.length > 0) {
-      const failedExpectationsDescription = failedExpectations.map(s => `  ${s}`).join('\n');
+      const failedDiffs = failedExpectations
+        .map(s => `Snapshot for ${s.fileName} changed:\n\n${s.diff}\n`).join('\n');
+
+      console.log(failedDiffs);
 
       if (options.update) {
-        console.log(`Test expectations updated for modules:\n${failedExpectationsDescription}\n`)
+        console.log(`${failedExpectations.length} test expectations updated.\n`);
       } else {
-        throw `Tests failed for modules:\n${failedExpectationsDescription}\n` +
-        `\nTo update the expectations, run this command again with the --update flag.\n`;
+        console.log(`${failedExpectations.length} tests failed, see above for diffs.`);
+        console.log(`To update the expectations, run this command again with the --update flag.`);
+        throw ``;
       }
     } else {
       console.log(`All tests passed.`)

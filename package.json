@@ -18,12 +18,14 @@
   "license": "ISC",
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.14.0-beta.5",
+    "diff": "^4.0.1",
     "minimist": "~1.2.0",
     "rollup": "~1.11.3",
     "rollup-plugin-node-resolve": "~4.2.3",
     "rollup-plugin-terser": "~4.0.4"
   },
   "devDependencies": {
+    "@types/diff": "^4.0.2",
     "@types/minimist": "~1.2.0",
     "@types/terser": "~3.8.0",
     "typescript": "^3.4.5"
