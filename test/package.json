@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "description": "Test suite for check-side-effects.",
   "scripts": {
-    "test": "node ../bin/check-side-effects --test side-effects.json"
+    "test": "node ../bin/check-side-effects --test side-effects.json",
+    "update": "npm run test -- --update"
   },
   "dependencies": {
-    "@angular/core": "8.0.0-rc.2"
+    "@angular/core": "8.1.0-next.1"
   }
 }
