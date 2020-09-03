@@ -55,7 +55,7 @@ export async function checkSideEffects({
   writeFileSync(tmpInputFilename, resolvedEsModules.map(m => `import '${m}';`).join('\n'));
 
   // Terser config to remove comments and beautify output.
-  const terserConfig: MinifyOptions = {
+  const terserConfig: MinifyOptions & { output: { comments: boolean, beautify: boolean } } = {
     mangle: false,
     compress: {
       // Override defaults to disable all optimizations.
@@ -63,6 +63,8 @@ export async function checkSideEffects({
       defaults: false,
       global_defs: globalDefs, // assume these variables are defined as the value provided
     },
+    // HACK: This was added to the type above, because it doesn't seem to be supported by
+    // the types for terser Minify Options. Recommend investigating.
     output: {
       comments: false,
       beautify: true,
