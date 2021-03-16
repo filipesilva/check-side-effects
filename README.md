@@ -16,7 +16,7 @@ Similarly, if you call `myFunction()` on the top level and static analysis canno
 
 A more subtle side effect is property read, like `const obj = {}; obj.prop;`. `obj` isn't really used, and it's not even exported. But because something might be happening on the property read, it's retained in the final bundle.
 
-It's incommon to have size effects on property read and for that reason some tools offer a configuration option to assume property reads have no side effects.
+It's uncommon to have side effects on property reads and for that reason some tools offer a configuration option to assume property reads have no side effects.
 
 These examples are trivial but on complex pieces of software you will likely find non-trivial variations of the same theme.
 
@@ -53,7 +53,7 @@ check-side-effects ./path/to/library/module.js
 check-side-effects ./path/to/library/module.js ./path/to/another-library/module.js
 ```
 
-Please note that this tool is meant to check individual ES modules. Passing in a library name won't work. You have to give a relative path to a .js file containing with ES module code.
+Please note that this tool is meant to check individual ES modules. Passing in a library name won't work. You have to give a relative path to a .js file containing ES module code.
 
 You can also pass the `--output` argument to output to a file instead. Doing this will also output sourcemaps, which you can use to trace where the code came from.
 
