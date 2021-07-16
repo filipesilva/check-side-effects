@@ -1,6 +1,7 @@
-import { resolve } from 'path';
-import { writeFileSync, unlinkSync, existsSync } from 'fs';
-import { OutputOptions, OutputAsset, rollup, InputOptions } from 'rollup';
+import { tmpdir } from "os"
+import { join, resolve } from 'path';
+import { writeFileSync, unlinkSync, existsSync, mkdtempSync, rmdirSync } from 'fs';
+import { OutputOptions, OutputAsset, OutputChunk, rollup, InputOptions } from 'rollup';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import buildOptimizer from '@angular-devkit/build-optimizer/src/build-optimizer/rollup-plugin.js';
@@ -51,7 +52,8 @@ export async function checkSideEffects({
 
   // Write a temporary file that imports the module to test.
   // This is needed because Rollup requires a real file.
-  const tmpInputFilename = resolve(cwd, './check-side-effects.tmp-input.js');
+  const tmpDir = mkdtempSync(join(tmpdir(), 'check-side-effects-'))
+  const tmpInputFilename = resolve(tmpDir, './index.js');
   writeFileSync(tmpInputFilename, resolvedEsModules.map(m => `import '${m}';`).join('\n'));
 
   // Terser config to remove comments and beautify output.
@@ -110,25 +112,25 @@ export async function checkSideEffects({
     bundle.watchFiles.forEach(f => console.log(f));
   }
 
+  let outputs: [OutputChunk, ...(OutputChunk | OutputAsset)[]] | undefined;
   if (outputFilePath) {
     // Write the bundle to disk.
     await bundle.write(outputOptions);
-
-    // Delete the temporary input file.
-    unlinkSync(tmpInputFilename);
-
     // Print instructions on how to analyze the source map.
     console.log(`\n`
       + `  Open http://sokra.github.io/source-map-visualization/ and drag the\n`
       + `  output js and js.map to see where the remaining code comes from.\n`);
   } else {
-    const { output } = await bundle.generate(outputOptions);
+    outputs = (await bundle.generate(outputOptions)).output;
+  }
 
-    // Delete the temporary input file.
-    unlinkSync(tmpInputFilename);
+  // Delete the temporary directory. (if node engine >10, change to use recursive: true)
+  unlinkSync(tmpInputFilename);
+  rmdirSync(tmpDir);
 
+  if (outputs) {
     // Return the chunk code.
-    return output
+    return outputs
       .filter(chunkOrAsset => !(chunkOrAsset as OutputAsset).isAsset)
       .map(chunk => chunk.code)
       .join('\n');
