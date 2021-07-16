@@ -116,6 +116,10 @@ export async function checkSideEffects({
   if (outputFilePath) {
     // Write the bundle to disk.
     await bundle.write(outputOptions);
+    // Print instructions on how to analyze the source map.
+    console.log(`\n`
+      + `  Open http://sokra.github.io/source-map-visualization/ and drag the\n`
+      + `  output js and js.map to see where the remaining code comes from.\n`);
   } else {
     outputs = (await bundle.generate(outputOptions)).output;
   }
@@ -123,13 +127,6 @@ export async function checkSideEffects({
   // Delete the temporary directory. (if node engine >10, change to use recursive: true)
   unlinkSync(tmpInputFilename);
   rmdirSync(tmpDir);
-
-  // If bundle was written out, print instructions on how to analyze the source map.
-  if (!outputs) {
-    console.log(`\n`
-      + `  Open http://sokra.github.io/source-map-visualization/ and drag the\n`
-      + `  output js and js.map to see where the remaining code comes from.\n`);
-  }
 
   if (outputs) {
     // Return the chunk code.
